@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgage Estimator</title>
+    <style>
+        :root {
+            --bg: #f4fbf7;
+            --surface: #ffffff;
+            --text: #064e3b;
+            --accent: #059669;
+            --accent-muted: #d1fae5;
+            --border: #d1fae5;
+            --font: system-ui, sans-serif;
+        }
+
+        body {
+            font-family: var(--font);
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .calculator {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            text-align: center;
+            color: var(--accent);
+        }
+
+        .slider-group {
+            margin-bottom: 24px;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .input-manual {
+            width: 100px;
+            text-align: right;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 5px;
+            font-family: inherit;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .results {
+            background-color: var(--accent-muted);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .results-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .results-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <h2>Mortgage Estimator</h2>
+        
+        <div class="slider-group">
+            <div class="label-row">
+                <span>Home Value ($)</span>
+                <input type="number" id="home-manual" class="input-manual" value="300000" min="50000" max="1500000">
+            </div>
+            <input type="range" id="home-slider" min="50000" max="1500000" step="10000" value="300000" oninput="syncInputs('home')">
+        </div>
+
+        <div class="slider-group">
+            <div class="label-row">
+                <span>Down Payment ($)</span>
+                <input type="number" id="down-manual" class="input-manual" value="60000" min="0" max="500000">
+            </div>
+            <input type="range" id="down-slider" min="0" max="500000" step="5000" value="60000" oninput="syncInputs('down')">
+        </div>
+
+        <div class="toggle-group">
+            <button class="toggle-btn active" id="term-30" onclick="setTerm(30)">30-Year Loan</button>
+            <button class="toggle-btn" id="term-15" onclick="setTerm(15)">15-Year Loan</button>
+        </div>
+
+        <div class="results">
+            <div class="results-label">Estimated Monthly Payment</div>
+            <div class="results-value" id="monthly-payment">$1,438</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">Assuming a baseline interest rate of 6.0%.</div>
+        </div>
+    </div>
+
+    <script>
+        const homeSlider = document.getElementById('home-slider');
+        const homeManual = document.getElementById('home-manual');
+        const downSlider = document.getElementById('down-slider');
+        const downManual = document.getElementById('down-manual');
+        const monthlyPaymentVal = document.getElementById('monthly-payment');
+
+        let loanTermYears = 30;
+        const interestRate = 0.06; // Fixed baseline
+
+        function syncInputs(type) {
+            if (type === 'home') {
+                homeManual.value = homeSlider.value;
+            } else {
+                downManual.value = downSlider.value;
+            }
+            calculateMortgage();
+        }
+
+        homeManual.addEventListener('input', () => {
+            homeSlider.value = homeManual.value;
+            calculateMortgage();
+        });
+
+        downManual.addEventListener('input', () => {
+            downSlider.value = downManual.value;
+            calculateMortgage();
+        });
+
+        function setTerm(years) {
+            loanTermYears = years;
+            document.getElementById('term-30').classList.toggle('active', years === 30);
+            document.getElementById('term-15').classList.toggle('active', years === 15);
+            calculateMortgage();
+        }
+
+        function calculateMortgage() {
+            const home = parseFloat(homeManual.value) || 0;
+            const down = parseFloat(downManual.value) || 0;
+            const principal = home - down;
+
+            if (principal <= 0) {
+                monthlyPaymentVal.textContent = '$0';
+                return;
+            }
+
+            const monthlyRate = interestRate / 12;
+            const totalPayments = loanTermYears * 12;
+
+            // Standard Amortization Formula
+            const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / (Math.pow(1 + monthlyRate, totalPayments) - 1);
+
+            monthlyPaymentVal.textContent = '$' + Math.round(monthlyPayment).toLocaleString();
+        }
+    </script>
+</body>
+</html>
