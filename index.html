@@ -6,147 +6,258 @@
     <title>Mortgage Estimator</title>
     <style>
         :root {
-            --bg: #f4fbf7;
-            --surface: #ffffff;
-            --text: #064e3b;
+            --bg-base: #f0fdf4;
+            --bg-card: #ffffff;
+            --text-main: #064e3b;
+            --text-muted: #15803d;
             --accent: #059669;
-            --accent-muted: #d1fae5;
-            --border: #d1fae5;
-            --font: system-ui, sans-serif;
+            --accent-hover: #047857;
+            --accent-light: #d1fae5;
+            --border: #a7f3d0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+            --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: var(--font);
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg-base);
+            color: var(--text-main);
             padding: 40px 20px;
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        .calculator {
-            background-color: var(--surface);
+        .calc-card {
+            background-color: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 30px;
+            padding: 32px;
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+            max-width: 540px;
+            box-shadow: var(--shadow);
         }
 
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 24px;
+        .calc-header {
             text-align: center;
-            color: var(--accent);
+            margin-bottom: 28px;
         }
 
-        .slider-group {
-            margin-bottom: 24px;
+        .calc-header h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .calc-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .input-group {
+            margin-bottom: 22px;
         }
 
         .label-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 8px;
-            font-weight: 600;
+        }
+
+        .label-row span {
             font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .input-box-wrapper {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+        }
+
+        .currency-symbol {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-right: 4px;
+        }
+
+        .input-manual {
+            width: 90px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            text-align: right;
+            outline: none;
         }
 
         input[type="range"] {
             width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            outline: none;
             accent-color: var(--accent);
             cursor: pointer;
         }
 
-        .input-manual {
-            width: 100px;
-            text-align: right;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 2px 5px;
-            font-family: inherit;
-            font-weight: bold;
-            outline: none;
-        }
-
-        .toggle-group {
+        .term-toggle {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 24px;
         }
 
         .toggle-btn {
             flex: 1;
             padding: 10px;
-            background-color: var(--bg);
+            background-color: var(--bg-base);
             border: 1px solid var(--border);
             border-radius: 8px;
             color: var(--accent);
             cursor: pointer;
             font-weight: 600;
+            font-size: 0.9rem;
             transition: all 0.15s;
         }
 
         .toggle-btn.active {
             background-color: var(--accent);
             color: white;
+            border-color: var(--accent);
         }
 
-        .results {
-            background-color: var(--accent-muted);
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 24px;
+        .output-box {
+            background-color: var(--accent-light);
+            border: 1px solid rgba(5, 150, 105, 0.15);
+            border-radius: 12px;
+            padding: 24px;
             text-align: center;
         }
 
-        .results-label {
-            font-size: 0.85rem;
+        .output-label {
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--accent);
-            font-weight: 700;
+            margin-bottom: 4px;
         }
 
-        .results-value {
-            font-size: 2.2rem;
-            font-weight: 800;
+        .output-val {
+            font-size: 2.5rem;
+            font-weight: 900;
             color: var(--accent);
-            margin: 5px 0;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+            border-top: 1px solid rgba(5, 150, 105, 0.1);
+            padding-top: 15px;
+            font-size: 0.8rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .detail-lbl {
+            color: var(--text-muted);
+        }
+
+        .detail-val {
+            font-weight: 700;
+            color: var(--text-main);
         }
     </style>
 </head>
 <body>
 
-    <div class="calculator">
-        <h2>Mortgage Estimator</h2>
-        
-        <div class="slider-group">
+    <div class="calc-card">
+        <div class="calc-header">
+            <h2>Mortgage Estimator</h2>
+            <p>Estimate full monthly mortgage costs including taxes & insurance</p>
+        </div>
+
+        <!-- INPUT 1: HOME VALUE -->
+        <div class="input-group">
             <div class="label-row">
-                <span>Home Value ($)</span>
-                <input type="number" id="home-manual" class="input-manual" value="300000" min="50000" max="1500000">
+                <span>Home Value</span>
+                <div class="input-box-wrapper">
+                    <span class="currency-symbol">$</span>
+                    <input type="number" id="home-manual" class="input-manual" value="350000" min="50000" max="2000000">
+                </div>
             </div>
-            <input type="range" id="home-slider" min="50000" max="1500000" step="10000" value="300000" oninput="syncInputs('home')">
+            <input type="range" id="home-slider" min="50000" max="2000000" step="10000" value="350000" oninput="syncInputs('home')">
         </div>
 
-        <div class="slider-group">
+        <!-- INPUT 2: DOWN PAYMENT -->
+        <div class="input-group">
             <div class="label-row">
-                <span>Down Payment ($)</span>
-                <input type="number" id="down-manual" class="input-manual" value="60000" min="0" max="500000">
+                <span>Down Payment</span>
+                <div class="input-box-wrapper">
+                    <span class="currency-symbol">$</span>
+                    <input type="number" id="down-manual" class="input-manual" value="70000" min="0" max="500000">
+                </div>
             </div>
-            <input type="range" id="down-slider" min="0" max="500000" step="5000" value="60000" oninput="syncInputs('down')">
+            <input type="range" id="down-slider" min="0" max="500000" step="5000" value="70000" oninput="syncInputs('down')">
         </div>
 
-        <div class="toggle-group">
-            <button class="toggle-btn active" id="term-30" onclick="setTerm(30)">30-Year Loan</button>
-            <button class="toggle-btn" id="term-15" onclick="setTerm(15)">15-Year Loan</button>
+        <!-- INPUT 3: INTEREST RATE -->
+        <div class="input-group">
+            <div class="label-row">
+                <span>Interest Rate</span>
+                <div class="input-box-wrapper">
+                    <input type="number" id="rate-manual" class="input-manual" value="6.5" min="1" max="15" step="0.1">
+                    <span class="currency-symbol" style="margin-left: 4px;">%</span>
+                </div>
+            </div>
+            <input type="range" id="rate-slider" min="1" max="15" step="0.1" value="6.5" oninput="syncInputs('rate')">
         </div>
 
-        <div class="results">
-            <div class="results-label">Estimated Monthly Payment</div>
-            <div class="results-value" id="monthly-payment">$1,438</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;">Assuming a baseline interest rate of 6.0%.</div>
+        <!-- LOAN TERM SWITCH -->
+        <div class="term-toggle">
+            <button class="toggle-btn active" id="term-30" onclick="setTerm(30)">30-Year Fixed</button>
+            <button class="toggle-btn" id="term-15" onclick="setTerm(15)">15-Year Fixed</button>
+        </div>
+
+        <!-- OUTPUT RESULTS -->
+        <div class="output-box">
+            <div class="output-label">Estimated Monthly Payment</div>
+            <div class="output-val" id="payment-val">$2,118</div>
+            
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-lbl">Principal & Interest</span>
+                    <span class="detail-val" id="detail-pi">$1,770</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-lbl">Est. Taxes & Insurance</span>
+                    <span class="detail-val" id="detail-tax-ins">$348</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -155,16 +266,22 @@
         const homeManual = document.getElementById('home-manual');
         const downSlider = document.getElementById('down-slider');
         const downManual = document.getElementById('down-manual');
-        const monthlyPaymentVal = document.getElementById('monthly-payment');
+        const rateSlider = document.getElementById('rate-slider');
+        const rateManual = document.getElementById('rate-manual');
+
+        const paymentValueElement = document.getElementById('payment-val');
+        const detailPiElement = document.getElementById('detail-pi');
+        const detailTaxInsElement = document.getElementById('detail-tax-ins');
 
         let loanTermYears = 30;
-        const interestRate = 0.06; // Fixed baseline
 
         function syncInputs(type) {
             if (type === 'home') {
                 homeManual.value = homeSlider.value;
-            } else {
+            } else if (type === 'down') {
                 downManual.value = downSlider.value;
+            } else if (type === 'rate') {
+                rateManual.value = rateSlider.value;
             }
             calculateMortgage();
         }
@@ -173,9 +290,12 @@
             homeSlider.value = homeManual.value;
             calculateMortgage();
         });
-
         downManual.addEventListener('input', () => {
             downSlider.value = downManual.value;
+            calculateMortgage();
+        });
+        rateManual.addEventListener('input', () => {
+            rateSlider.value = rateManual.value;
             calculateMortgage();
         });
 
@@ -189,21 +309,45 @@
         function calculateMortgage() {
             const home = parseFloat(homeManual.value) || 0;
             const down = parseFloat(downManual.value) || 0;
+            const annualRate = (parseFloat(rateManual.value) || 0) / 100;
+
             const principal = home - down;
 
             if (principal <= 0) {
-                monthlyPaymentVal.textContent = '$0';
+                paymentValueElement.textContent = '$0';
+                detailPiElement.textContent = '$0';
+                detailTaxInsElement.textContent = '$0';
                 return;
             }
 
-            const monthlyRate = interestRate / 12;
+            // 1. Calculate Principal and Interest (P&I)
+            const monthlyRate = annualRate / 12;
             const totalPayments = loanTermYears * 12;
+            let monthlyPI = 0;
 
-            // Standard Amortization Formula
-            const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / (Math.pow(1 + monthlyRate, totalPayments) - 1);
+            if (monthlyRate > 0) {
+                monthlyPI = principal * (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / (Math.pow(1 + monthlyRate, totalPayments) - 1);
+            } else {
+                monthlyPI = principal / totalPayments;
+            }
 
-            monthlyPaymentVal.textContent = '$' + Math.round(monthlyPayment).toLocaleString();
+            // 2. Real-world Taxes & Insurance Estimates (T&I)
+            // Assumes annual property tax is 1.2% of home value
+            // Assumes annual home insurance is 0.35% of home value
+            const monthlyTaxes = (home * 0.012) / 12;
+            const monthlyInsurance = (home * 0.0035) / 12;
+            const monthlyTI = monthlyTaxes + monthlyInsurance;
+
+            const totalMonthlyPayment = monthlyPI + monthlyTI;
+
+            // Render output values
+            detailPiElement.textContent = '$' + Math.round(monthlyPI).toLocaleString();
+            detailTaxInsElement.textContent = '$' + Math.round(monthlyTI).toLocaleString();
+            paymentValueElement.textContent = '$' + Math.round(totalMonthlyPayment).toLocaleString();
         }
+
+        // Initial Calculation
+        calculateMortgage();
     </script>
 </body>
 </html>
